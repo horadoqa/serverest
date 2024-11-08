@@ -1,0 +1,123 @@
+services:
+  test-base:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: test/Dockerfile.test
+    volumes:
+      - ./test:/app/test:ro
+
+  run-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    entrypoint: npm run dev
+    volumes:
+      - .:/app:rw
+    ports:
+      - "3000:3000"
+
+# All tests \/
+
+  test-contract:
+    extends: test-base
+    environment:
+      - PACT_BROKER_TOKEN
+      - PACT_URL
+      - CI
+    command: npm run test:contract
+    volumes:
+      - ./.git:/app/.git:ro
+
+  test-unit:
+    extends: test-base
+    environment: # Datadog "CI Tests" variables
+      - DD_CIVISIBILITY_AGENTLESS_ENABLED
+      - DD_API_KEY
+      - DD_SITE
+      - NODE_OPTIONS
+      - DD_GIT_REPOSITORY_URL
+      - DD_GIT_COMMIT_SHA
+      - DD_GIT_BRANCH
+    command: npm run test:unit
+    volumes:
+      - ./coverage-unit:/app/coverage-unit:rw
+
+  test-integration:
+    extends: test-base
+    command: npm run test:integration
+    volumes:
+      - ./coverage-integration:/app/coverage-integration:rw
+    environment:
+      - TEST_TYPE=integration
+      # Datadog "CI Tests" variables
+      - DD_CIVISIBILITY_AGENTLESS_ENABLED
+      - DD_API_KEY
+      - DD_SITE
+      - NODE_OPTIONS
+      - DD_GIT_REPOSITORY_URL
+      - DD_GIT_COMMIT_SHA
+      - DD_GIT_BRANCH
+
+  run-app-e2e:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: 'serverest-development'
+
+  test-e2e-localhost:
+    extends: test-base
+    command: npm run test:e2e
+    environment:
+      - TEST_TYPE=e2e-localhost
+      # Datadog "CI Tests" variables
+      - DD_CIVISIBILITY_AGENTLESS_ENABLED
+      - DD_API_KEY
+      - DD_SITE
+      - NODE_OPTIONS
+      - DD_GIT_REPOSITORY_URL
+      - DD_GIT_COMMIT_SHA
+      - DD_GIT_BRANCH
+    depends_on:
+      - run-app-e2e
+    network_mode: 'service:run-app-e2e'
+
+  test-mutation:
+    extends: test-base
+    environment:
+      - STRYKER_DASHBOARD_API_KEY
+      - TEST_TYPE=mutation
+    command: npm run test:mutation
+    volumes:
+      - ./reports:/app/reports:rw
+
+  test-mutation-diff:
+    extends: test-base
+    environment:
+      - STRYKER_DASHBOARD_API_KEY
+      - TEST_TYPE=mutation
+    command: npm run test:mutation:diff
+    volumes:
+      - ./reports:/app/reports:rw
+
+  test-infra:
+    build:
+      context: .
+      dockerfile: test/infra/Dockerfile.terratest
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+# Deploy test \/
+
+  test-e2e-staging:
+    extends: test-base
+    command: npm run test:e2e -- --retries 1 --slow 1000
+    environment:
+      TEST_TYPE: 'e2e-staging'
+
+  test-e2e-smoke-production:
+    extends: test-base
+    command: npm run test:smoke -- --retries 1 --slow 1000
+    environment:
+      TEST_TYPE: 'e2e-production'

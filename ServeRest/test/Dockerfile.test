@@ -1,0 +1,21 @@
+FROM node:lts-slim@sha256:357deca6eb61149534d32faaf5e4b2e4fa3549c2be610ee1019bf340ea8c51ec
+
+WORKDIR /app
+
+# hadolint ignore=DL3008
+RUN apt-get update && apt-get install --no-install-recommends -y \
+  git \
+  ca-certificates \
+  wget \
+  bash \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN git config --global --add safe.directory "*"
+
+ENV NODE_ENV=serverest-test
+
+COPY package*.json ./
+
+RUN npm ci
+
+COPY . .

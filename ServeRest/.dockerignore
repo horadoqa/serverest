@@ -1,0 +1,15 @@
+.env.example
+.github
+.nyc_output
+dist/
+test/
+!test/infra/
+reports/
+CHANGELOG.md
+.stryker-tmp
+stryker.log
+coverage/
+coverage-unit/
+coverage-integration/
+lcov.info
+node_modules/

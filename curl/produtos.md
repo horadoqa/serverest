@@ -27,7 +27,7 @@ curl https://serverest.dev/produtos/5YSkZrzmYFfLqCrw
 Com `grep`
 
 ```bash
-curl https://serverest.dev/produtos | grep "JBL"
+curl -s https://serverest.dev/produtos | grep "JBL"
 ```
 
 Com `JQ`

@@ -1,0 +1,25 @@
+# Production dockerfile - Delivered at Google Cloud
+# hadolint ignore=DL3029
+FROM --platform=linux/amd64 datadog/serverless-init:1.2.1-alpine@sha256:61bfb550f733736c1b6bdb7922bd68677844551f372037be53a3eb98835dbed3 as datadog-serverless
+
+FROM datadog/dd-lib-js-init:v5.11.0@sha256:9a1e2f052a3891d21e2df354423cd8ebee4d32af5a5bf0e786b3207ddcc9fb8a as datadog-lib-js-init
+
+FROM node:lts-alpine3.18@sha256:a02826c7340c37a29179152723190bcc3044f933c925f3c2d78abb20f794de3f as base
+
+ENV ENVIRONMENT='docker'
+
+COPY --from=datadog-serverless /datadog-init /app/datadog-init
+
+COPY --from=datadog-lib-js-init /operator-build/node_modules /dd_tracer/node/
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm ci --production --ignore-scripts
+
+COPY . .
+
+EXPOSE 3000
+ENTRYPOINT ["/app/datadog-init"]
+CMD ["npm", "start", "--", "0"]
