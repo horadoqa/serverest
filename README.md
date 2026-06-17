@@ -1,5 +1,7 @@
 # ServeRest
 
+[![Badge ServeRest](https://img.shields.io/badge/API-ServeRest-green)](https://github.com/ServeRest/ServeRest/)
+
 "O ServeRest é uma API REST gratuita que simula uma loja virtual, projetada para ser uma ferramenta de aprendizado e prática para testes de API. Ela permite que desenvolvedores e testadores explorem e realizem testes em endpoints RESTful, utilizando dados fictícios de produtos, categorias e usuários, o que a torna ideal para quem deseja aprimorar suas habilidades em automação de testes, integração e consumo de APIs."
 
 https://serverest.dev/
@@ -25,13 +27,25 @@ E muitos outros.
 
 - Compatibilidade multiplataforma: O curl é uma ferramenta amplamente disponível em várias plataformas, como Linux, macOS e Windows, e também pode ser usado em scripts e automações.
 
-## Como usar o curl?
+## Como usar o `curl`?
 
-A sintaxe básica do curl é a seguinte:
+O `curl` é uma ferramenta de linha de comando utilizada para enviar requisições e transferir dados entre um cliente e um servidor. Sua sintaxe básica é:
 
-````bash
+```bash
 curl [opções] [URL]
-
 ```
 
-Onde [opções] são os parâmetros que você deseja passar para a requisição, e [URL] é o endereço da web ou servidor com o qual você está interagindo.
+Onde:
+
+* **`[opções]`**: parâmetros que definem como a requisição será realizada, como método HTTP, cabeçalhos, autenticação e envio de dados.
+* **`[URL]`**: endereço do recurso ou serviço com o qual você deseja interagir.
+
+### Exemplo
+
+```bash
+curl https://api.exemplo.com/usuarios
+```
+
+Nesse caso, o `curl` envia uma requisição para a URL informada e retorna a resposta do servidor no terminal.
+
+À medida que você adiciona opções, é possível personalizar a requisição para atender diferentes necessidades, como enviar dados, definir cabeçalhos ou utilizar métodos HTTP específicos.
